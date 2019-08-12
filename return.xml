@@ -1,0 +1,24 @@
+<resultSet xmlns="urn:trimet:arrivals" queryTime="1565568352431">
+<location desc="SE 17th & Center" dir="Northbound" lat="45.4938497222815" lng="-122.648214049212" locid="6849"/>
+<location desc="SE 17th & Center" dir="Southbound" lat="45.4941036890001" lng="-122.648671236999" locid="6850"/>
+<arrival block="7006" departed="true" dir="1" status="estimated" estimated="1565569065000" fullSign="70 12th Ave to Milwaukie via 13th & Tacoma" piece="1" route="70" scheduled="1565569140000" shortSign="70 To Milwaukie via 13th" locid="6850" detour="true">
+<blockPosition feet="9514" at="1565568336457" heading="180" lat="45.5174571" lng="-122.6546633">...</blockPosition>
+</arrival>
+<arrival block="7004" departed="false" dir="0" status="estimated" estimated="1565569620000" fullSign="70 12th Ave to 11th & Holladay" piece="1" route="70" scheduled="1565569620000" shortSign="70 Holladay-11th" locid="6849" detour="true">
+<blockPosition feet="18934" at="1565568339390" heading="81" lat="45.4448612" lng="-122.6407768">...</blockPosition>
+</arrival>
+<arrival block="1701" departed="true" dir="0" status="estimated" estimated="1565569831000" fullSign="17 Holgate to SE 134th Ave" piece="1" route="17" scheduled="1565569800000" shortSign="17 To SE 134th" locid="6850" detour="true">
+<blockPosition feet="19955" at="1565568341465" heading="176" lat="45.5230215" lng="-122.6753857">...</blockPosition>
+</arrival>
+<arrival block="1705" departed="true" dir="1" status="estimated" estimated="1565569885000" fullSign="17 Holgate/Broadway to NE Saratoga & 27th" piece="1" route="17" scheduled="1565569800000" shortSign="17 To Saratoga" locid="6849" detour="true">
+<blockPosition feet="29331" at="1565568328470" heading="271" lat="45.4896393" lng="-122.539261">...</blockPosition>
+</arrival>
+<arrival block="7007" departed="true" dir="1" status="estimated" estimated="1565570378000" fullSign="70 12th Ave to Milwaukie via 17th & Tacoma" piece="1" route="70" scheduled="1565570340000" shortSign="70 To Milwaukie via 17th" locid="6850" detour="true">
+<blockPosition feet="28530" at="1565568328516" heading="179" lat="45.54904" lng="-122.6307078">...</blockPosition>
+</arrival>
+<arrival block="7005" departed="false" dir="0" status="estimated" estimated="1565571120000" fullSign="70 12th Ave to 11th & Holladay" piece="1" route="70" scheduled="1565571120000" shortSign="70 Holladay-11th" locid="6849" detour="true">
+<blockPosition feet="37184" at="1565568340529" heading="180" lat="45.4852731" lng="-122.648372">...</blockPosition>
+</arrival>
+<arrival block="1702" departed="false" dir="0" status="scheduled" fullSign="17 Holgate to SE 134th Ave" piece="1" route="17" scheduled="1565572140000" shortSign="17 To SE 134th" locid="6850" detour="true"/>
+<arrival block="1706" departed="false" dir="1" status="scheduled" fullSign="17 Holgate/Broadway to NE Saratoga & 27th" piece="1" route="17" scheduled="1565572200000" shortSign="17 To Saratoga" locid="6849" detour="true"/>
+</resultSet>
