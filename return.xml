@@ -1,6 +1,5 @@
 <resultSet xmlns="urn:trimet:arrivals" queryTime="1565568352431">
 <location desc="SE 17th & Center" dir="Northbound" lat="45.4938497222815" lng="-122.648214049212" locid="6849"/>
-<location desc="SE 17th & Center" dir="Southbound" lat="45.4941036890001" lng="-122.648671236999" locid="6850"/>
 <arrival block="7006" departed="true" dir="1" status="estimated" estimated="1565569065000" fullSign="70 12th Ave to Milwaukie via 13th & Tacoma" piece="1" route="70" scheduled="1565569140000" shortSign="70 To Milwaukie via 13th" locid="6850" detour="true">
 <blockPosition feet="9514" at="1565568336457" heading="180" lat="45.5174571" lng="-122.6546633">...</blockPosition>
 </arrival>
