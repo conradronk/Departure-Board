@@ -4,7 +4,11 @@ import xml.etree.ElementTree as ET
 import pandas as pd
 
 #Authentication and stop ids definitions
-API_key = "6C292EB7ABD605BE358A442D2"
+keys_txt = open("keys.txt","r")
+
+API_key = keys_txt.readline()
+keys_txt.close()
+
 stop_IDs = {"417", "418", "2615", "2616"} # Will need to figure out how to handle multiple stops
 #417:15WB, 418:15EB, 2616:14WB, 2615:14EB
 
