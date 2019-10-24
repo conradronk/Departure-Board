@@ -76,6 +76,7 @@ def humanReadable(table): #pass the entire table, converts into something more h
                     departureTimes += " " + relativeTimingInfo(row["scheduled"])
             output = output.append({"line":i,"bound_to":j,"departures":departureTimes},ignore_index=True)
 
+
     print(output)
     return output #returns a single line with all selected buses
 
