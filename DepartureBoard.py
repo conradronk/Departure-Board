@@ -18,7 +18,7 @@ stop_IDs = {"417", "418", "2615", "2616"}
 #417:15WB, 418:15EB, 2616:14WB, 2615:14EB
 
 #determines how far out relative timings will be used
-relative_time_horizon = 15000
+relative_time_horizon = 30 * 1000 * 60
 
 def fetch_GTFS(): #submits the request to Trimet, returning an XML string
     stop_string = ","
@@ -55,7 +55,7 @@ def shortSignAliases(rawShortSign): #to be used for consolidating known aliases
 def relativeTimingInfo(eventTime):
     currentTime = time.time()*1000
     eventTime = int(eventTime)
-    if (eventTime-currentTime>relative_time_horizon):
+    if (eventTime-currentTime < relative_time_horizon):
         return str(math.floor(((eventTime-currentTime)/1000)/60))
     else:
         return str("XX:XX") #str(time.localtime(eventTime/1000))
@@ -70,11 +70,11 @@ def humanReadable(table): #pass the entire table, converts into something more h
             relevantLines = (table.loc[(table["route"] == i) & (table["dir"] == j)]) #selects the rows that have the exact right line and direction
             departureTimes = ""
             for index, row in relevantLines.iterrows():
-                print("this is a new line") # will be adding code here to make the first addition different (no leading spaces)
-                departureTimes += " " + relativeTimingInfo(row["estimated"])
-                print(departureTimes)
+                if row["estimated"] != "NaN":
+                    departureTimes += " " + relativeTimingInfo(row["estimated"])
+                else:
+                    departureTimes += " " + relativeTimingInfo(row["scheduled"])
             output = output.append({"line":i,"bound_to":j,"departures":departureTimes},ignore_index=True)
-            print(output)
 
     print(output)
     return output #returns a single line with all selected buses
