@@ -58,7 +58,8 @@ def relativeTimingInfo(eventTime):
     if (eventTime-currentTime < relative_time_horizon):
         return str(math.floor(((eventTime-currentTime)/1000)/60))
     else:
-        return str("XX:XX") #str(time.localtime(eventTime/1000))
+        return time.strftime("%I:%M", time.localtime(eventTime/1000))
+        #return str("XX:XX") #str(time.localtime(eventTime/1000))
 
 def humanReadable(table): #pass the entire table, converts into something more human readable ready for display formatting
     output = pd.DataFrame(columns=["line","bound_to", "departures"])
@@ -70,7 +71,7 @@ def humanReadable(table): #pass the entire table, converts into something more h
             relevantLines = (table.loc[(table["route"] == i) & (table["dir"] == j)]) #selects the rows that have the exact right line and direction
             departureTimes = ""
             for index, row in relevantLines.iterrows():
-                if row["estimated"] != "NaN":
+                if isinstance(row["estimated"], str): # This works for now, but I don't know if I like how it works
                     departureTimes += " " + relativeTimingInfo(row["estimated"])
                 else:
                     departureTimes += " " + relativeTimingInfo(row["scheduled"])
