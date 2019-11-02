@@ -5,9 +5,11 @@ import pandas as pd
 import numpy as np
 import time
 import math
+import ImageProcessing
+from PIL import Image, ImageDraw, ImageFont
 
 # Config variables
-keys_txt = open("keys.txt","r") #Authentication and stop ids definitions file location
+keys_txt = open("keys.txt","r") #Authentication and TODO {stop ids definitions} file location
 API_key = keys_txt.readline()
 keys_txt.close()
 
@@ -46,12 +48,13 @@ def shortSignAliases(rawShortSign): #to be used for consolidating known aliases
     #Want to block the 15 directions for my purposes
     #TODO Create a dictionary of domain and ranges for appropiate aliases
     associations = {
-        "15 To Thurman":"15 to Portland",
-        "15 To NW Yeon": "15 to Portland",
+        "15 To Thurman":"15 Portland",
+        "15 To NW Yeon": "15 Portland",
         "15 Gateway TC": "15 Eastbound",
         "15 To 60th Ave": "15 Eastbound",
-        "14 To 94-Foster": "14 to 94th & Foster",
-        "14 To Portland": "14 to Portland"
+        "15 Montgomery Pk": "15 Portland",
+        "14 To 94-Foster": "14 94-Foster",
+        "14 To Portland": "14 City Center"
     }
     return associations[rawShortSign]
 
@@ -64,7 +67,7 @@ def relativeTimingInfo(eventTime):
         return time.strftime("%I:%M", time.localtime(eventTime/1000))
 
 def humanReadable(table): #pass the entire table, converts into something more human readable ready for display formatting
-    output = pd.DataFrame(columns=["line","bound_to", "departures"])
+    output = pd.DataFrame(columns=["line","dir","bound_to", "departures"])
     routes = table["route"].unique()
 
     for i in routes:
@@ -74,7 +77,7 @@ def humanReadable(table): #pass the entire table, converts into something more h
 
             # Generating the appropiate time info and creates a string, 'departureTimes'
             departureTimes = ""
-            for index, row in relevantLines.iterrows():
+            for index, row in relevantLines.iterrows(): # TODO: add more spacing between times, or commas?
                 if isinstance(row["estimated"], str): # This works for now, but I don't know if I like how it works
                     departureTimes += " " + relativeTimingInfo(row["estimated"])
                 else:
@@ -84,19 +87,52 @@ def humanReadable(table): #pass the entire table, converts into something more h
             relevantLines["shortSign"].iloc[0]
             shortSign = shortSignAliases(relevantLines["shortSign"].iloc[0])
 
-            output = output.append({"line":i,"bound_to":shortSign,"departures":departureTimes},ignore_index=True)
+            output = output.append({"line":i,"dir":j,"bound_to":shortSign,"departures":departureTimes},ignore_index=True)
     return output #returns a single line with all selected buses
 
-def format(table):
+def format(table): #not sure where and how I want to handle formatting
     output = ""
 
 
 # And, here's where "Main" starts
-#example: 'block': '1521', 'departed': 'false', 'dir': '0', 'status': 'scheduled', 'fullSign': '15  Belmont/NW 23rd to NW Thurman St', 'piece': '1', 'route': '15', 'scheduled': '1568867948000','estimated': '1568866545000', 'shortSign': '15 To Thurman', 'locid': '417', 'detour': 'true'
+# selecting from these which columns to use: 'block': '1521', 'departed': 'false', 'dir': '0', 'status': 'scheduled', 'fullSign': '15  Belmont/NW 23rd to NW Thurman St', 'piece': '1', 'route': '15', 'scheduled': '1568867948000','estimated': '1568866545000', 'shortSign': '15 To Thurman', 'locid': '417', 'detour': 'true'
 by_block = pd.DataFrame(columns=["route","dir","fullSign", "shortSign", "scheduled","estimated", "reason"])
 by_block = parse_GTFS(fetch_GTFS(),by_block)
 
-print(humanReadable(by_block))
+humanReady = humanReadable(by_block).set_index(["line","dir"])
+
+print(humanReady.xs(["14","1"]).loc["bound_to"])
+
+frame = Image.new("RGB",(128,32))
+fnt = ImageFont.truetype(font="pixelmix/pixelmix.ttf",size=8, layout_engine=ImageFont.LAYOUT_BASIC)
+d = ImageDraw.Draw(frame)
+d.fontmode = "1"
+
+d.text((0,-1), humanReady.xs(["14","1"]).loc["bound_to"], font=fnt, fill=(255,187,45))
+departures_r1 = humanReady.xs(["14","1"]).loc["departures"]
+coords_r1 = 128-d.textsize(departures_r1,font=fnt)[0]
+d.text((coords_r1,-1),departures_r1,font=fnt, fill=(255,187,45))
+
+d.text((0,7), humanReady.xs(["14","0"]).loc["bound_to"],font=fnt, fill=(255,187,45))
+departures_r2 = humanReady.xs(["14","0"]).loc["departures"]
+coords_r2 = 128-d.textsize(departures_r2,font=fnt)[0]
+d.text((coords_r2,7),departures_r2,font=fnt, fill=(255,187,45))
+
+
+d.text((0,15), humanReady.xs(["15","0"]).loc["bound_to"],font=fnt, fill=(255,187,45))
+departures_r3 = humanReady.xs(["15","0"]).loc["departures"]
+coords_r3 = 128-d.textsize(departures_r3,font=fnt)[0]
+d.text((coords_r3,15),departures_r3,font=fnt, fill=(255,187,45))
+
+d.text((0,23), humanReady.xs(["15","1"]).loc["bound_to"],font=fnt, fill=(255,187,45))
+departures_r4 = humanReady.xs(["15","1"]).loc["departures"]
+coords_r4 = 128-d.textsize(departures_r4,font=fnt)[0]
+d.text((coords_r4,23),departures_r4,font=fnt, fill=(255,187,45))
+
+
+frame.show()
+
+
 
 
 
