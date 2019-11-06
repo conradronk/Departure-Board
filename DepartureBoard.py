@@ -1,4 +1,5 @@
 import time
+
 sTime = time.time()
 
 import urllib.request
@@ -7,6 +8,9 @@ import xml.etree.ElementTree as ET
 import pandas as pd
 import numpy as np
 import math
+import sys
+
+from rgbmatrix import RGBMatrix, RGBMatrixOptions
 from PIL import Image, ImageDraw, ImageFont
 
 # Config variables
@@ -17,6 +21,13 @@ keys_txt.close()
 stop_IDs = {"417", "418", "2615", "2616"} #417:15WB, 418:15EB, 2616:14WB, 2615:14EB
 
 relative_time_horizon = 30 * 1000 * 60 #determines how far out relative timings will be used
+
+#image matrix config stuff
+options = RGBMatrixOptions()
+options.rows = 32
+options.chain_length = 4
+options.parallel = 1
+options.hardware_mapping = 'adafruit-hat'  # If you have an Adafruit HAT: 'adafruit-hat'
 
 
 # All the functions
@@ -52,6 +63,7 @@ def shortSignAliases(rawShortSign): #to be used for consolidating known aliases
         "15 To NW Yeon": "15 Portland",
         "15 Gateway TC": "15 Eastbound",
         "15 To 60th Ave": "15 Eastbound",
+        "15 To 92nd Ave": "15 Eastbound",
         "15 Montgomery Pk": "15 Portland",
         "14 To 94-Foster": "14 94-Foster",
         "14 To Portland": "14 City Center"
@@ -61,13 +73,13 @@ def shortSignAliases(rawShortSign): #to be used for consolidating known aliases
 def relativeTimingInfo(eventTime):
     currentTime = time.time()*1000
     eventTime = int(eventTime)
-    if (eventTime-currentTime < relative_time_horizon):
+    if (eventTime-currentTime < relative_time_horizon): #For minutes till style
         return str(math.floor(((eventTime-currentTime)/1000)/60))
     else:
-        if time.strftime("%I", time.localtime(eventTime/1000))[0] == "0":
+        if time.strftime("%I", time.localtime(eventTime/1000))[0] == "0": #For single digit hours
             return time.strftime("%I:%M", time.localtime(eventTime/1000))[1:]
         else:
-            return time.strftime("%I:%M", time.localtime(eventTime/1000))
+            return time.strftime("%I:%M", time.localtime(eventTime/1000)) #For two digit hours
 
 def humanReadable(table): #pass the entire table, converts into something more human readable ready for display formatting
     output = pd.DataFrame(columns=["line","dir","bound_to", "departures"])
@@ -101,43 +113,45 @@ def format(table): #not sure where and how I want to handle formatting
 # selecting from these which columns to use: 'block': '1521', 'departed': 'false', 'dir': '0', 'status': 'scheduled', 'fullSign': '15  Belmont/NW 23rd to NW Thurman St', 'piece': '1', 'route': '15', 'scheduled': '1568867948000','estimated': '1568866545000', 'shortSign': '15 To Thurman', 'locid': '417', 'detour': 'true'
 print("initialization completed in " + str(sTime-time.time()) + " seconds")
 
-for i in range(3):
+fnt = ImageFont.truetype(font="pixelmix/pixelmix.ttf",size=8, layout_engine=ImageFont.LAYOUT_BASIC)
+
+while True:
     sTime = time.time()
     by_block = pd.DataFrame(columns=["route","dir","fullSign", "shortSign", "scheduled","estimated", "reason"])
     by_block = parse_GTFS(fetch_GTFS(),by_block)
 
-    humanReady = humanReadable(by_block).set_index(["line","dir"])
+    for i in range(3):
+        humanReady = humanReadable(by_block).set_index(["line","dir"])
 
-    frame = Image.new("RGB",(128,32))
-    fnt = ImageFont.truetype(font="pixelmix/pixelmix.ttf",size=8, layout_engine=ImageFont.LAYOUT_BASIC)
-    d = ImageDraw.Draw(frame)
-    d.fontmode = "1"
+        frame = Image.new("RGB",(128,32))
+        d = ImageDraw.Draw(frame)
+        d.fontmode = "1"
 
-    d.text((0,-1), humanReady.xs(["14","1"]).loc["bound_to"], font=fnt, fill=(255,187,45))
-    departures_r1 = humanReady.xs(["14","1"]).loc["departures"]
-    coords_r1 = 128-d.textsize(departures_r1,font=fnt)[0]
-    d.text((coords_r1,-1),departures_r1,font=fnt, fill=(255,187,45))
+        d.text((0,-1), humanReady.xs(["14","1"]).loc["bound_to"], font=fnt, fill=(255,187,45))
+        departures_r1 = humanReady.xs(["14","1"]).loc["departures"]
+        coords_r1 = 128-d.textsize(departures_r1,font=fnt)[0]
+        d.text((coords_r1,-1),departures_r1,font=fnt, fill=(255,187,45))
 
-    d.text((0,7), humanReady.xs(["14","0"]).loc["bound_to"],font=fnt, fill=(255,187,45))
-    departures_r2 = humanReady.xs(["14","0"]).loc["departures"]
-    coords_r2 = 128-d.textsize(departures_r2,font=fnt)[0]
-    d.text((coords_r2,7),departures_r2,font=fnt, fill=(255,187,45))
+        d.text((0,7), humanReady.xs(["15","0"]).loc["bound_to"],font=fnt, fill=(255,187,45))
+        departures_r2 = humanReady.xs(["15","0"]).loc["departures"]
+        coords_r2 = 128-d.textsize(departures_r2,font=fnt)[0]
+        d.text((coords_r2,7),departures_r2,font=fnt, fill=(255,187,45))
 
+        d.text((0,15), humanReady.xs(["14","0"]).loc["bound_to"],font=fnt, fill=(255,187,45))
+        departures_r3 = humanReady.xs(["14","0"]).loc["departures"]
+        coords_r3 = 128-d.textsize(departures_r3,font=fnt)[0]
+        d.text((coords_r3,15),departures_r3,font=fnt, fill=(255,187,45))
 
-    d.text((0,15), humanReady.xs(["15","0"]).loc["bound_to"],font=fnt, fill=(255,187,45))
-    departures_r3 = humanReady.xs(["15","0"]).loc["departures"]
-    coords_r3 = 128-d.textsize(departures_r3,font=fnt)[0]
-    d.text((coords_r3,15),departures_r3,font=fnt, fill=(255,187,45))
-
-    d.text((0,23), humanReady.xs(["15","1"]).loc["bound_to"],font=fnt, fill=(255,187,45))
-    departures_r4 = humanReady.xs(["15","1"]).loc["departures"]
-    coords_r4 = 128-d.textsize(departures_r4,font=fnt)[0]
-    d.text((coords_r4,23),departures_r4,font=fnt, fill=(255,187,45))
+        d.text((0,23), humanReady.xs(["15","1"]).loc["bound_to"],font=fnt, fill=(255,187,45))
+        departures_r4 = humanReady.xs(["15","1"]).loc["departures"]
+        coords_r4 = 128-d.textsize(departures_r4,font=fnt)[0]
+        d.text((coords_r4,23),departures_r4,font=fnt, fill=(255,187,45))
 
 
-    #frame.show()
-    frame.save("temp.png",format="png")
-    print("Loop completed in " + str(time.time()-sTime) + " seconds")
+        matrix = RGBMatrix(options = options)
+        matrix.SetImage(frame.convert('RGB'))
+
+        time.sleep(20)
 
 
 
