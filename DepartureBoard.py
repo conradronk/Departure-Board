@@ -59,12 +59,13 @@ def shortSignAliases(rawShortSign): #to be used for consolidating known aliases
     #Want to block the 15 directions for my purposes
     #TODO Create a dictionary of domain and ranges for appropiate aliases
     associations = {
-        "15 To Thurman":"15 Portland",
-        "15 To NW Yeon": "15 Portland",
         "15 Gateway TC": "15 Eastbound",
         "15 To 60th Ave": "15 Eastbound",
         "15 To 92nd Ave": "15 Eastbound",
         "15 Montgomery Pk": "15 Portland",
+        "15 To Thurman":"15 Portland",
+        "15 To NW Yeon": "15 Portland",
+        "15 To  SW 5th & Washington": "15 Portland",
         "14 To 94-Foster": "14 94-Foster",
         "14 To Portland": "14 City Center"
     }
